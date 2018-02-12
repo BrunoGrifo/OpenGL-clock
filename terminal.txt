@@ -1,0 +1,1 @@
+gcc -o exe trab1_segundos.c -lGL -lGLU -lglut -lm

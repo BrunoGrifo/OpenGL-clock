@@ -8,21 +8,22 @@
 
 
 //.................................................... Bibliotecas necessarias
-#include <windows.h>			// printf
-#include <stdio.h>			// printf
+#include <stdio.h>			
 #include <math.h>
 #include <time.h>
 #include <GL/glut.h>
 #define PI  3.14159
 
 struct tm *current_time;
-GLint second;
+GLint second,min,hour;
 char texto[30];		            //.. texto, i.e, numeros do relogio = [1..12]
 
 
 //.................................................... Variaveis
 GLint   msecDelay=1000;				//.. definicao do timer (actualizacao)
 GLfloat angulo=0.0;
+GLfloat angulo1=0.0;
+GLfloat angulo2=0.0;
 GLfloat raio=70;
 
 //-----------------------------------------------------------------------------------
@@ -79,7 +80,7 @@ void desenhaCirculo(float raio, float lineW)
    int i;
    glLineWidth(lineW);
    glBegin(GL_LINE_LOOP);
-     for (i=0; i<360; i++) {
+     for (i=0; i<370; i++) {
        rad = i*PI/180.0;
        glVertex2f( raio*cos(rad), raio*sin(rad));
      }
@@ -90,7 +91,7 @@ void desenhaCirculo(float raio, float lineW)
 //---------------------------------------- Função callback de desenho (principal)
 void desenhaJanela(void)
 {
-   float r, angrad, rotacao;
+   float r, angrad,angrad1,angrad2, rotacao,rotacao1,rotacao2;
 	 
    glClear(GL_COLOR_BUFFER_BIT);		//.. Limpa de acordo com cor predefinida
   
@@ -98,28 +99,66 @@ void desenhaJanela(void)
    time_t timer = time(0);
    current_time = localtime(&timer);
    second = current_time->tm_sec;
+   min = current_time->tm_min;
+	hour = current_time->tm_hour;
 
    
+	//----------------------------- Circulos
+	   glColor3d(1,1,1);
+	   desenhaCirculo(raio, 50);
+	   sprintf(texto, "%2d", second);
+	   desenhaTexto(texto, 8,0);
+
+	   glColor3d(1,0,1);
+	   desenhaCirculo((2*raio)/3, 50);
+	   sprintf(texto, "%2d:", min);
+	   desenhaTexto(texto, 0,0);
+
+	   glColor3d(1,1,0);
+	   desenhaCirculo((raio)/3, 50);
+	   sprintf(texto, "%2d:", hour);
+	   desenhaTexto(texto, -8,0);
+	   glColor3d(1,1,1);
 
   //----------------------------- Traingulo = ponteiro
    angulo = 90 - 6*second;
    angrad= (angulo*PI)/180.0;
+   
+   angulo1 = 90 - 6*min;
+   angrad1= (angulo1*PI)/180.0;
+   
+   angulo2 = 90 - 30*hour;
+   angrad2= (angulo2*PI)/180.0;
+   
    rotacao= angulo -90;
+   rotacao1= angulo1 -90;
+   rotacao2= angulo2 -90;
    
    glPushMatrix();
       glTranslatef( 70*cos(angrad), 70*sin(angrad), 0);
       glRotatef( rotacao, 0,0,1);
-      glScalef(0.5, 2, 1);
+      glScalef(0.5, 1.5, 1);
       desenhaTriangulo(10);                                
    glPopMatrix();
+
+   glPushMatrix();
+      glTranslatef( 40*cos(angrad1), 40*sin(angrad1), 0);
+      glRotatef( rotacao1, 0,0,1);
+      glScalef(0.4, 1, 1);
+      desenhaTriangulo(10);                                
+   glPopMatrix();
+
+   glPushMatrix();
+      glTranslatef( 20*cos(angrad2), 20*sin(angrad2), 0);
+      glRotatef( rotacao2, 0,0,1);
+      glScalef(0.3, 0.5, 1);
+      desenhaTriangulo(10);                                
+   glPopMatrix();
+
+
   
 
-   //----------------------------- Circulos
-   glColor3d(1,1,1);
-   desenhaCirculo(raio, 5);
-   sprintf(texto, "%2d", second);
-   desenhaTexto(texto, 0,0);
-
+   
    glutSwapBuffers();					//.. actualiza ecran
  
 }
